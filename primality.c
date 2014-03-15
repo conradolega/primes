@@ -21,9 +21,44 @@ void print_val(NODE *head){
 	printf("\n");
 }
 
+//true if a>=b
+int compare(NODE *a, NODE *b){
+	NODE *tempa;
+	NODE *tempb;
+	int result = 0;
+
+	tempa = a;
+	tempb = b;
+
+	while(tempa != NULL && tempb != NULL){
+		if(tempa->val >= tempb->val){
+			result = 1;
+		}
+		else{
+			result = 0;
+		}
+		tempa = tempa->next;
+		tempb = tempb->next;
+	}
+
+	if(tempa==NULL && tempb==NULL){
+		return result;
+	}
+	//a>=b
+	else if(tempa==NULL){
+		return 0; 
+	}
+	//a<b
+	else{
+		return 1;
+	}
+}
+
 int main(){
 	NODE *head;
 	NODE *newnode;
+	NODE *a;
+	NODE *b;
 
 	/*
 	STRUCT
@@ -60,5 +95,30 @@ int main(){
 	newnode->next = NULL;
 	head->next->next->next->next = newnode;
 
-	print_val(head);
+
+	//TEST COMPARISON
+	/*
+	a = (NODE*)(malloc(sizeof(NODE)));
+	b = (NODE*)(malloc(sizeof(NODE)));
+
+	newnode = (NODE*)(malloc(sizeof(NODE)));
+	newnode->val = 111;
+	a->next = newnode;
+
+	newnode = (NODE*)(malloc(sizeof(NODE)));
+	newnode->val = 11111;
+	newnode->next = NULL;
+	a->next->next = newnode;
+
+	newnode = (NODE*)(malloc(sizeof(NODE)));
+	newnode->val = 111;
+	b->next = newnode;
+
+	printf("a value: ");
+	print_val(a);
+	printf("b value: ");
+	print_val(b);
+
+	printf("compare: %d\n", compare(b,a));
+	*/
 }
