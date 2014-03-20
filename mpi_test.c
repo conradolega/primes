@@ -2,6 +2,14 @@
 #include <stdlib.h>
 #include <mpi.h>
 
+int mod(int a, int b) {
+	return a % b;
+}
+
+int divide(int a, int b) {
+	return a / b;
+}
+
 void not_prime(int a) {
 	printf("%d is not prime\n", a);
 	MPI_Finalize();
