@@ -31,6 +31,10 @@ int main(int argc, char **argv) {
 	// temporary big integer
 	int big_int = 442592;
 
+	if (mod(big_int, 2) == 0) {
+		not_prime(big_int);
+	}
+
 	// sender process
 	if (rank != 0) {
 		MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
