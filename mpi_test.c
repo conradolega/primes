@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <mpi.h>
 
+void not_prime(int a) {
+	printf("%d is not prime\n", a);
+	MPI_Finalize();
+	exit(0);
+}
+
 int main(int argc, char **argv) {
 
 	// initialize MPI
