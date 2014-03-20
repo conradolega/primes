@@ -14,6 +14,9 @@ int main(int argc, char **argv) {
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	printf("Rank: %d Size: %d\n", rank, size);
 	
+	// temporary big integer
+	int big_int = 442592;
+
 	// sender process
 	if (rank != 0) {
 		MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
