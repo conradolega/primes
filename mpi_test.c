@@ -3,6 +3,17 @@
 #include <mpi.h>
 #include <gmp.h>
 
+void not_prime(mpz_t i) {
+	
+	mpz_out_str(stdout, 10, i);
+	printf(" is not prime.\n");
+
+	int is_init;
+	MPI_Initialized(&is_init);
+	if (is_init) MPI_Finalize();
+	exit(0);
+}
+
 int main(int argc, char **argv) {
 
 	// initialize MPI
