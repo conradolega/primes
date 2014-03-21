@@ -35,6 +35,9 @@ int main(int argc, char **argv) {
 	}
 	// receiving process
 	else {
+		if (mpz_divisible_ui_p(big_int, 2) != 0) {
+			not_prime(big_int);
+		}
 		for (i = 1; i < size; i++) {
 			MPI_Recv(&number, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			printf("Process %d has called\n", number);
