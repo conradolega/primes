@@ -26,23 +26,47 @@ int main(int argc, char **argv) {
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	printf("Rank: %d Size: %d\n", rank, size);
 
-	mpz_t big_int, sqrt_limit, chunk_size, chunk_rem;
-	mpz_init_set_str(big_int, "5353929539259923612512543426253959355355351112", 10);
+	mpz_t big_int, big_size, sqrt_limit, chunk_size, chunk_rem;
+	mpz_t count, start_limit, end_limit;
+	mpz_init_set_str(big_int, "1111111111111111111", 10);
 
-	// sender process
-	if (rank != 0) {
-		MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+	//Calculate Square Root Limit
+	mpz_init(sqrt_limit);
+	mpz_sqrt(sqrt_limit, big_int);
+	gmp_printf("sqrt: %Zd\n", sqrt_limit);
+
+	//Calculate Chunk Size
+	mpz_init(chunk_size);
+	mpz_init(chunk_rem);
+	mpz_init_set_ui(big_size, size);
+	mpz_cdiv_qr(chunk_size, chunk_rem, sqrt_limit, big_size);
+	gmp_printf("chunk size: %Zd\n", chunk_size);
+
+	//Calculate Limits
+	mpz_init(start_limit);
+	mpz_init(end_limit);
+	if(rank==0){
+		mpz_init_set_ui(start_limit, 2);
 	}
-	// receiving process
-	else {
-		if (mpz_divisible_ui_p(big_int, 2) != 0) {
-			not_prime(big_int);
+	else{
+		mpz_mul_ui(start_limit, chunk_size, rank);
+	}
+	mpz_add(end_limit, start_limit, chunk_size);
+
+	//Primality Test
+	mpz_init(count);
+	mpz_init_set(count, start_limit); //count = start
+	while(mpz_cmp(count, end_limit) < 0){
+		//check if divisible
+		if(mpz_divisible_p(big_int, count)!=0){
+			//composite!
+			printf("COMPOSITE\n");
+			break;
 		}
-		for (i = 1; i < size; i++) {
-			MPI_Recv(&number, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			printf("Process %d has called\n", number);
-		} 
+		mpz_add_ui(count, count, 1); //count++
 	}
+
+	gmp_printf("number is prime from %Zd to %Zd\n", start_limit, end_limit);
 
 	// last MPI function to be called
 	MPI_Finalize();
