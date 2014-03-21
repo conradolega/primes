@@ -25,7 +25,10 @@ int main(int argc, char **argv) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	printf("Rank: %d Size: %d\n", rank, size);
-	
+
+	mpz_t big_int, sqrt_limit, chunk_size, chunk_rem;
+	mpz_init_set_str(big_int, "5353929539259923612512543426253959355355351112", 10);
+
 	// sender process
 	if (rank != 0) {
 		MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
