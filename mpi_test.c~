@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	if (rank == 0){
 		if (mpz_divisible_ui_p(big_int, 2) != 0) {
 			even = 1;
-			printf("EVEN - COMPOSITE\n");
+			printf("EVEN - COMPOSITE");
 		}
 	}
 
