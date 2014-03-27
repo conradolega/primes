@@ -78,6 +78,16 @@ int main(int argc, char **argv) {
 			if(mpz_divisible_p(big_int, count)!=0){
 				//composite!
 				printf("COMPOSITE\n");
+				for (i = 0; i < size; i++) {
+					if (i != rank) {
+						composite = 1;
+						MPI_Isend(&composite, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &req);
+					}
+				}
+				break;
+			}
+			MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, &status);
+			if (flag) {
 				break;
 			}
 			mpz_add_ui(count, count, 2); //count+2, skip even numbers
