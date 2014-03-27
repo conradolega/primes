@@ -21,7 +21,9 @@ int main(int argc, char **argv) {
 
 	// rank = rank of each process
 	// size = number of processes
-	int rank, size, number, i, even = 0;
+	int rank, size, number, i, even = 0, composite, flag;
+	MPI_Request req;
+	MPI_Status status;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	printf("Rank: %d Size: %d\n", rank, size);
