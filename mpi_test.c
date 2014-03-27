@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
 	mpz_t big_int, big_size, sqrt_limit, chunk_size, chunk_rem;
 	mpz_t count, start_limit, end_limit;
-	mpz_init_set_str(big_int, "1111111111111111112", 10);
+	mpz_init_set_str(big_int, "1111111111111111111", 10);
 
 	if (rank == 0){
 		if (mpz_divisible_ui_p(big_int, 2) != 0) {
@@ -61,6 +61,11 @@ int main(int argc, char **argv) {
 		else{
 			mpz_mul_ui(start_limit, chunk_size, rank);
 		}
+
+		// If start_limit is even, add 1 to make it odd
+		if (mpz_divisible_ui_p(start_limit, 2) != 0) {
+			mpz_add_ui(start_limit, start_limit, 1);
+		}
 		mpz_add(end_limit, start_limit, chunk_size);
 
 		//Primality Test
@@ -73,7 +78,7 @@ int main(int argc, char **argv) {
 				printf("COMPOSITE\n");
 				break;
 			}
-			mpz_add_ui(count, count, 1); //count++
+			mpz_add_ui(count, count, 2); //count+2, skip even numbers
 		}
 
 		gmp_printf("number is prime from %Zd to %Zd\n", start_limit, end_limit);
