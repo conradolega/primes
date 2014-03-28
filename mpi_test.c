@@ -15,6 +15,16 @@ void not_prime(mpz_t i) {
 }
 
 int main(int argc, char **argv) {
+	setbuf(stdout, NULL);
+	int number_of_digits;
+	char *user_input;
+
+	printf("Enter number of digits : ");
+	scanf("%d",&number_of_digits);
+	user_input = (char*) malloc(number_of_digits*sizeof(char));
+
+	printf("Enter your number : ");
+	scanf("%s",user_input);
 
 	// initialize MPI
 	MPI_Init(&argc, &argv);
@@ -31,7 +41,7 @@ int main(int argc, char **argv) {
 
 	mpz_t big_int, big_size, sqrt_limit, chunk_size, chunk_rem;
 	mpz_t count, start_limit, end_limit;
-	mpz_init_set_str(big_int, "1689542430967", 10);
+	mpz_init_set_str(big_int, user_input, 10);
 
 	if (rank == 0){
 		if (mpz_divisible_ui_p(big_int, 2) != 0) {
