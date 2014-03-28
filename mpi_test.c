@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
 	// rank = rank of each process
 	// size = number of processes
 	int rank, size, number, i, even = 0, composite, flag;
+	int is_prime = 0, is_prime_others;
 	MPI_Request req;
 	MPI_Status status;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -93,8 +94,34 @@ int main(int argc, char **argv) {
 			mpz_add_ui(count, count, 2); //count+2, skip even numbers
 		}
 
-		gmp_printf("number is prime from %Zd to %Zd\n", start_limit, end_limit);
+		// gmp_printf("number is prime from %Zd to %Zd\n", start_limit, end_limit);
 
+		is_prime = 1;
+		for(i=0; i<size; i++){
+			if(i != rank){
+				// printf("Process %d is sending process %d prime: %d.\n", rank, i, is_prime);
+				MPI_Send(&is_prime, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			}
+		}
+
+		for(i=0; i<size; i++){
+			if(i != rank){
+				// printf("Process %d is recving process %d\n.", rank, i);
+				MPI_Recv(&is_prime_others, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+				//This statement will AND(operator) all received is_prime's.
+				if(is_prime == 1){
+					is_prime = is_prime_others;
+				}
+			}
+		}
+
+		//Only rank 0 will print
+		if(rank==0){
+			if(is_prime == 1){
+				printf("The input is prime.\n");
+			}
+		}
 	}
 
 	// last MPI function to be called
