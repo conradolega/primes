@@ -21,8 +21,8 @@ int main(int argc, char **argv) {
 
 	// rank = rank of each process
 	// size = number of processes
-	int rank, size, number, i, even = 0, composite, flag;
-	int is_prime = 0, is_prime_others;
+	int rank, size, number, i, even = 0, flag;
+	int composite = 0, com_others = 0;
 	MPI_Request req;
 	MPI_Status status;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
 	mpz_t big_int, big_size, sqrt_limit, chunk_size, chunk_rem;
 	mpz_t count, start_limit, end_limit;
-	mpz_init_set_str(big_int, "1111111111111111111", 10);
+	mpz_init_set_str(big_int, "1689542430967", 10);
 
 	if (rank == 0){
 		if (mpz_divisible_ui_p(big_int, 2) != 0) {
@@ -74,21 +74,23 @@ int main(int argc, char **argv) {
 		//Primality Test
 		mpz_init(count);
 		mpz_init_set(count, start_limit); //count = start
-		while(mpz_cmp(count, end_limit) < 0){
+		while(mpz_cmp(count, end_limit) <= 0){
+			// gmp_printf("count: %Zd\n", count);
 			//check if divisible
 			if(mpz_divisible_p(big_int, count)!=0){
 				//composite!
-				printf("COMPOSITE\n");
+				composite = 1;
 				for (i = 0; i < size; i++) {
 					if (i != rank) {
-						composite = 1;
 						MPI_Isend(&composite, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &req);
 					}
 				}
 				break;
 			}
 			MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, &status);
+			// MPI_Test(&req, &flag, &status);
 			if (flag) {
+				composite = 1;
 				break;
 			}
 			mpz_add_ui(count, count, 2); //count+2, skip even numbers
@@ -96,32 +98,38 @@ int main(int argc, char **argv) {
 
 		// gmp_printf("number is prime from %Zd to %Zd\n", start_limit, end_limit);
 
-		is_prime = 1;
-		for(i=0; i<size; i++){
+		//PROCESS JOIN
+		MPI_Barrier(MPI_COMM_WORLD);
+
+		printf("rank: %d composite_val: %d\n", rank, composite);
+		for(i=0; i<size && size != 1; i++){
 			if(i != rank){
-				// printf("Process %d is sending process %d prime: %d.\n", rank, i, is_prime);
-				MPI_Send(&is_prime, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+				MPI_Send(&composite, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 			}
 		}
 
-		for(i=0; i<size; i++){
+		for(i=0; i<size && size != 1; i++){
 			if(i != rank){
-				// printf("Process %d is recving process %d\n.", rank, i);
-				MPI_Recv(&is_prime_others, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&com_others, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-				//This statement will AND(operator) all received is_prime's.
-				if(is_prime == 1){
-					is_prime = is_prime_others;
+				//This statement will NOT AND(operator) all received is_prime's.
+				if(composite == 0){
+					composite = com_others;
 				}
 			}
 		}
-
+		
 		//Only rank 0 will print
 		if(rank==0){
-			if(is_prime == 1){
+			if(composite == 0){
 				printf("The input is prime.\n");
 			}
+			else{
+				printf("The input is composite.\n", composite);
+			}
 		}
+		
+		
 	}
 
 	// last MPI function to be called
