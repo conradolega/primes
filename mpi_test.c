@@ -20,13 +20,6 @@ int main(int argc, char **argv) {
 	char *user_input;
 	int *composite_arr;
 
-	printf("Enter number of digits : ");
-	scanf("%d",&number_of_digits);
-	user_input = (char*) malloc(number_of_digits*sizeof(char));
-
-	printf("Enter your number : ");
-	scanf("%s",user_input);
-
 	// initialize MPI
 	MPI_Init(&argc, &argv);
 
@@ -38,21 +31,29 @@ int main(int argc, char **argv) {
 	MPI_Status status;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	printf("Rank: %d Size: %d\n", rank, size);
 
 	mpz_t big_int, big_size, sqrt_limit, chunk_size, chunk_rem;
 	mpz_t count, start_limit, end_limit;
-	mpz_init_set_str(big_int, user_input, 10);
+	if (rank == 0) {
+		printf("Enter number of digits : ");
+		scanf("%d",&number_of_digits);
+		user_input = (char*) malloc(number_of_digits*sizeof(char));
 
-	if (rank == 0){
+		printf("Enter your number : ");
+		scanf("%s",user_input);
+		mpz_init_set_str(big_int, user_input, 10);
 		if (mpz_divisible_ui_p(big_int, 2) != 0) {
 			even = 1;
 			printf("The input is composite (even).\n");
 		}
 	}
 
+	MPI_Bcast(&number_of_digits, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	if (rank != 0) user_input = (char*) malloc(number_of_digits*sizeof(char));
+	MPI_Bcast(user_input, number_of_digits, MPI_CHAR, 0, MPI_COMM_WORLD);
 	MPI_Bcast(&even, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	if( even == 0 ){
+		mpz_init_set_str(big_int, user_input, 10);
 
 		//Calculate Square Root Limit
 		mpz_init(sqrt_limit);
