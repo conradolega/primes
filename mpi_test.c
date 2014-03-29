@@ -109,11 +109,11 @@ int main(int argc, char **argv) {
 			int i;
 			for(i=0; i<=size; i++){
 				if(i == size){
-					printf("The input is composite.\n");
+					printf("The input is prime.\n");
 					break;
 				}
 				if(composite_arr[i] == 1){
-					printf("The input is prime.\n");
+					printf("The input is composite.\n");
 					break;
 				}
 			}
